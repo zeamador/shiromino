@@ -93,9 +93,9 @@ static long framedelay(Uint64 ticks_elap, double fps)
 /* <constants> */
 
 struct bindings defaultkeybinds[2] = {
-    {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RETURN, SDLK_f, SDLK_d, SDLK_s, SDLK_a, SDLK_ESCAPE},
+    {SDLK_LEFT, SDLK_RIGHT, SDLK_UP, SDLK_DOWN, SDLK_RETURN, SDLK_f, SDLK_d, SDLK_s, SDLK_a, SDLK_ESCAPE, 0, 3, 5, 4},
 
-    {SDLK_j, SDLK_l, SDLK_i, SDLK_k, SDLK_TAB, SDLK_r, SDLK_e, SDLK_w, SDLK_q, SDLK_F11}};
+    {SDLK_j, SDLK_l, SDLK_i, SDLK_k, SDLK_TAB, SDLK_r, SDLK_e, SDLK_w, SDLK_q, SDLK_F11, 0, 3, 5, 4}};
 
 struct settings defaultsettings = {&defaultkeybinds[0], 1, true, false, 50, 100, 100, NULL};
 
@@ -137,6 +137,10 @@ struct bindings *bindings_copy(struct bindings *src)
     b->c = src->c;
     b->d = src->d;
     b->escape = src->escape;
+	b->joy_a = src->joy_a;
+	b->joy_b = src->joy_b;
+	b->joy_c = src->joy_c;
+	b->joy_d = src->joy_d;
 
     return b;
 }
@@ -979,37 +983,34 @@ int procevents(coreState *cs, GuiWindow& wind)
             case SDL_JOYHATMOTION:
                 k = &cs->keys_raw;
 
-                if(event.jhat.which == 0)
+                if(event.jhat.which == 0 && event.jhat.hat == 0)
                 {
-                    if(event.jhat.hat == 0)
+                    if(event.jhat.value == SDL_HAT_LEFT)
                     {
-                        if(event.jhat.value == SDL_HAT_LEFT)
-                        {
-                            k->left = 1;
-                            k->right = 0;
-                        }
-                        else if(event.jhat.value == SDL_HAT_RIGHT)
-                        {
-                            k->right = 1;
-                            k->left = 0;
-                        }
-                        else if(event.jhat.value == SDL_HAT_UP)
-                        {
-                            k->up = 1;
-                            k->down = 0;
-                        }
-                        else if(event.jhat.value == SDL_HAT_DOWN)
-                        {
-                            k->down = 1;
-                            k->up = 0;
-                        }
-                        else
-                        {
-                            k->right = 0;
-                            k->left = 0;
-                            k->up = 0;
-                            k->down = 0;
-                        }
+                        k->left = 1;
+                        k->right = 0;
+                    }
+                    else if(event.jhat.value == SDL_HAT_RIGHT)
+                    {
+                        k->right = 1;
+                        k->left = 0;
+                    }
+                    else if(event.jhat.value == SDL_HAT_UP)
+                    {
+                        k->up = 1;
+                        k->down = 0;
+                    }
+                    else if(event.jhat.value == SDL_HAT_DOWN)
+                    {
+                        k->down = 1;
+                        k->up = 0;
+                    }
+                    else
+                    {
+                        k->right = 0;
+                        k->left = 0;
+                        k->up = 0;
+                        k->down = 0;
                     }
                 }
 
@@ -1020,29 +1021,33 @@ int procevents(coreState *cs, GuiWindow& wind)
                 k = &cs->keys_raw;
                 if(joy)
                 {
-                    rc = SDL_JoystickGetButton(joy, 0);
-                    if(!rc)
-                        k->a = 0;
-                    if(rc && k->a == 0)
-                        k->a = 1;
+					if(cs->settings->keybinds)
+					{
+						kb = cs->settings->keybinds;
+	                    rc = SDL_JoystickGetButton(joy, kb->joy_a);
+	                    if(!rc)
+	                        k->a = 0;
+	                    if(rc && k->a == 0)
+	                        k->a = 1;
 
-                    rc = SDL_JoystickGetButton(joy, 3);
-                    if(!rc)
-                        k->b = 0;
-                    if(rc && k->b == 0)
-                        k->b = 1;
+	                    rc = SDL_JoystickGetButton(joy, kb->joy_b);
+	                    if(!rc)
+	                        k->b = 0;
+	                    if(rc && k->b == 0)
+	                        k->b = 1;
 
-                    rc = SDL_JoystickGetButton(joy, 5);
-                    if(!rc)
-                        k->c = 0;
-                    if(rc && k->c == 0)
-                        k->c = 1;
+	                    rc = SDL_JoystickGetButton(joy, kb->joy_c);
+	                    if(!rc)
+	                        k->c = 0;
+	                    if(rc && k->c == 0)
+	                        k->c = 1;
 
-                    rc = SDL_JoystickGetButton(joy, 4);
-                    if(!rc)
-                        k->d = 0;
-                    if(rc && k->d == 0)
-                        k->d = 1;
+	                    rc = SDL_JoystickGetButton(joy, kb->joy_d);
+	                    if(!rc)
+	                        k->d = 0;
+	                    if(rc && k->d == 0)
+	                        k->d = 1;
+					}
                 }
 
                 break;

@@ -187,7 +187,15 @@ struct bindings *get_cfg_bindings(vector<string>& lines)
                             strtools::format("P%dESCAPE", 1)};
 
     SDL_Keycode *keyptrs[9] = {
-        &bindings->left, &bindings->right, &bindings->up, &bindings->down, &bindings->a, &bindings->b, &bindings->c, &bindings->d, &bindings->escape};
+        &bindings->left,
+		&bindings->right,
+		&bindings->up,
+		&bindings->down,
+		&bindings->a,
+		&bindings->b,
+		&bindings->c,
+		&bindings->d,
+		&bindings->escape};
 
     unsigned int lineIndex = 0;
     for(auto str : lines)
@@ -239,6 +247,22 @@ struct bindings *get_cfg_bindings(vector<string>& lines)
             }
         }
     }
+
+	string joybuttonstrings[4] = {strtools::format("P%dJOYA", 1),
+								  strtools::format("P%dJOYB", 1),
+								  strtools::format("P%dJOYC", 1),
+								  strtools::format("P%dJOYD", 1)};
+
+	int *buttptrs[4] = {
+		&bindings->joy_a,
+		&bindings->joy_b,
+		&bindings->joy_c,
+		&bindings->joy_d};
+
+	for(int j = 0; j < 4; j++)
+	{
+		(*buttptrs[j]) = get_cfg_option(lines, joybuttonstrings[j]);
+	}
 
     return bindings;
 }

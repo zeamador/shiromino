@@ -59,6 +59,11 @@ struct bindings
     SDL_Keycode c;
     SDL_Keycode d;
     SDL_Keycode escape;
+
+	int joy_a;
+	int joy_b;
+	int joy_c;
+	int joy_d;
 };
 
 typedef enum {
